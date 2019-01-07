@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """
 Copyright (c) 2019. All rights reserved.
-@author salman malik
-@since 1/4/19
+@author:        salman malik
+@created:       1/4/19
+@last modified: 1/6/19
 """
 from __future__ import print_function
 from botocore.vendored import requests
@@ -58,11 +59,11 @@ def get_welcome_response():
     session_attributes = {}
     card_title = "Welcome"
     speech_output = "Welcome to the Prayer Times app. " \
-                    "You can ask me what time a specific prayer is." \
+                    "You can ask me what time a specific prayer is " \
                     "For example you can say when is Fajr?"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "You can ask me what time a specific prayer." \
+    reprompt_text = "You can ask me what time a specific prayer " \
                     "For example, you can says when is Fajr?"
     should_end_session = False
 
@@ -122,7 +123,7 @@ def when_is_isha():
     d = d.strftime("%I:%M %p")
     return d
 
-def set_prayer_in_session(intent_request, session):
+def set_prayer_in_session(intent_request, session, context):
     prayer = intent_request['slots']['prayer']['value']
 
     if prayer == 'fajr':
@@ -168,19 +169,19 @@ def on_launch(launch_request, session):
     # Dispatch to your skill's launch
     return get_welcome_response()
 
-def on_intent(intent_request, session):
+def on_intent(intent_request, session, context):
     """ Called when the user specifies an intent for this skill """
     print("on_intent requestId=" + intent_request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
     session = session
+    context = context
     intent = intent_request['intent']
     intent_name = intent_request['intent']['name']
 
     # Dispatch to your skill's intent handlers
     if intent_name == "PrayerTimeIntent":
-        return set_prayer_in_session(intent, session)
-        # return set_prayer_in_session(intent, session)
+        return set_prayer_in_session(intent, session, context)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
@@ -213,6 +214,6 @@ def lambda_handler(event, context):
     if event['request']['type'] == "LaunchRequest":
         return on_launch(event['request'], event['session'])
     elif event['request']['type'] == "IntentRequest":
-        return on_intent(event['request'], event['session'])
+        return on_intent(event['request'], event['session'], event['context'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
