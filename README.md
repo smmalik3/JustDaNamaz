@@ -1,5 +1,29 @@
 # JustDaNamaz
+# Developed by Salman Malik
+# MIT License
+
 Alexa Skill for Islamic Prayer Times
+
+This Voice Enabled Skill allows you to ask Alexa when any prayer is during the day.
+
+For example, you can ask Alexa to first open the skill by saying:
+"Alexa, open prayer times."
+
+Alexa will then open the skill and after the welcome message will wait for your next command which can be any of the following:
+
+1. When is Fajr?
+2. When is Dhuhr?
+3. When is Asr?
+4. When is Maghrib?
+5. When is Isha?
+6. Cancel or Stop
+
+This skill requests permission to know the zipcode of the device you are using in order to calculate the correct prayer time for your area. 
+
+If permission is not given the skill will not work.
+
+Below is information onn the Prayer Times API that was used to develop this skill.
+Thanks to www.aladhan.com for developing it!
 
 Prayer Times API Doc
 
