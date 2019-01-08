@@ -31,6 +31,26 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'shouldEndSession': should_end_session
     }
+## TODO: Build out ssml speechlet to send back appropriate text for displays, currently only voice is configured
+def build_ssml_speechlet_response(title, output, reprompt_text, should_end_session):
+    return {
+        'outputSpeech': {
+            'type': 'SSML',
+            'ssml': output
+        },
+        'card': {
+            'type': 'Simple',
+            'title': "SessionSpeechlet - " + title,
+            'content': "SessionSpeechlet - " + output
+        },
+        'reprompt': {
+            'outputSpeech': {
+                'type': 'PlainText',
+                'text': reprompt_text
+            }
+        },
+        'shouldEndSession': should_end_session
+    }
 
 def build_response(session_attributes, speechlet_response):
     return {
@@ -58,16 +78,14 @@ def get_welcome_response():
     """
     session_attributes = {}
     card_title = "Welcome"
-    speech_output = "Welcome to the Prayer Times app. " \
-                    "You can ask me what time a specific prayer is " \
-                    "For example you can say when is Fajr?"
+    speech_output = "<speak> <s>Welcome to the Prayer Times app.</s> <s> You can ask me what time a specific prayer is.</s> <s> For example <break strength='medium'/> you can say <break strength='medium'/> When is Fajr? </s> </speak>"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "You can ask me what time a specific prayer " \
                     "For example, you can says when is Fajr?"
     should_end_session = False
 
-    return build_response(session_attributes, build_speechlet_response(
+    return build_response(session_attributes, build_ssml_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
 def handle_session_end_request():

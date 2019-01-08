@@ -18,6 +18,12 @@ Alexa will then open the skill and after the welcome message will wait for your 
 5. When is Isha?
 6. Cancel or Stop
 
+You can also ask Alexa to find the prayer time for you by simply saying:
+
+"Alexa, ask prayer times when is Dhuhr?"
+
+Use the above if you would rather not hear the welcome message each time you open the skill and would prefer to consolidate two requests into one. :D
+
 This skill requests permission to know the zipcode of the device you are using in order to calculate the correct prayer time for your area. 
 
 If permission is not given the skill will not work.
