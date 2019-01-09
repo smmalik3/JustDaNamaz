@@ -60,12 +60,13 @@ def build_response(session_attributes, speechlet_response):
     }
 
 # Helper method to determine zipcode of the user
-def get_location(request, context):
-    deviceId = context['device']['deviceId']
-    token = context['user']['permissions']['consentToken']
-    url = 'https://api.amazonalexa.com/v1/devices/{}/settings/address/countryAndPostalCode'.format(deviceId)
-    headers = {'Accept': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
-    r = requests.get(url, headers=header)
+def get_location(context):
+    apiEndpoint = context['System']['apiEndpoint']
+    deviceId = context['System']['device']['deviceId']
+    apiAccessToken = context['System']['apiAccessToken']
+    url =  '{}/v1/devices/{}/settings/address/countryAndPostalCode'.format(apiEndpoint, deviceId)
+    headers = {'Accept': 'application/json', 'Authorization': 'Bearer {}'.format(apiAccessToken)}
+    r = requests.get(url, headers=headers)
     if r.status_code == 200:
         r = r.json()
         return r['postalCode']
@@ -78,7 +79,7 @@ def get_welcome_response():
     """
     session_attributes = {}
     card_title = "Welcome"
-    speech_output = "<speak> <s>Welcome to the Prayer Times app.</s> <s> You can ask me what time a specific prayer is.</s> <s> For example <break strength='medium'/> you can say <break strength='medium'/> When is Fajr? </s> </speak>"
+    speech_output = "<speak> <s>Assalamu Alaykum <break strength='medium'/> welcome to the Prayer Times skill.</s> <s> You can ask me what time a specific prayer is.</s> <s> For example <break strength='medium'/> you can say <break strength='medium'/> When is Fajr? </s> </speak>"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "You can ask me what time a specific prayer " \
@@ -100,73 +101,43 @@ def handle_session_end_request():
 # This url uses zipcode:
 # 'http://api.aladhan.com/v1/timingsByAddress?address=20009'
 
-# Methods for getting specific prayter times
-def when_is_fajr():
-    r = requests.get('http://api.aladhan.com/v1/timingsByCity?city=DC&country=US&method=2')
+# Method for getting specific prayter times
+def when_is_prayer(prayer, zipcode):
+    r = requests.get('http://api.aladhan.com/v1/timingsByAddress?address=' + zipcode + '&method=2')
     r = r.json()
-    r = r['data']['timings']['Fajr']
-    d = datetime.strptime(r, "%H:%M")
-    d = d.strftime("%I:%M %p")
-    return d
-
-def when_is_dhuhr():
-    r = requests.get('http://api.aladhan.com/v1/timingsByCity?city=DC&country=US&method=2')
-    r = r.json()
-    r = r['data']['timings']['Dhuhr']
-    d = datetime.strptime(r, "%H:%M")
-    d = d.strftime("%I:%M %p")
-    return d
-
-def when_is_asr():
-    r = requests.get('http://api.aladhan.com/v1/timingsByCity?city=DC&country=US&method=2')
-    r = r.json()
-    r = r['data']['timings']['Asr']
-    d = datetime.strptime(r, "%H:%M")
-    d = d.strftime("%I:%M %p")
-    return d
-
-def when_is_maghrib():
-    r = requests.get('http://api.aladhan.com/v1/timingsByCity?city=DC&country=US&method=2')
-    r = r.json()
-    r = r['data']['timings']['Maghrib']
-    d = datetime.strptime(r, "%H:%M")
-    d = d.strftime("%I:%M %p")
-    return d
-
-def when_is_isha():
-    r = requests.get('http://api.aladhan.com/v1/timingsByCity?city=DC&country=US&method=2')
-    r = r.json()
-    r = r['data']['timings']['Isha']
+    r = r['data']['timings'][prayer]
     d = datetime.strptime(r, "%H:%M")
     d = d.strftime("%I:%M %p")
     return d
 
 def set_prayer_in_session(intent_request, session, context):
     prayer = intent_request['slots']['prayer']['value']
+    zipcode = get_location(context)
 
     if prayer == 'fajr':
-       card_title = prayer + " is at " + when_is_fajr()
-       speech_output = prayer + " is at " + when_is_fajr()
+       card_title = prayer + " is at " + when_is_prayer('Fajr', zipcode)
+       speech_output = prayer + " is at " + when_is_prayer('Fajr', zipcode)
        should_end_session = True
     elif prayer == 'dhuhr':
-       card_title = prayer + " is at " + when_is_dhuhr()
-       speech_output = prayer + " is at " + when_is_dhuhr()
+       card_title = prayer + " is at " + when_is_prayer('Dhuhr', zipcode)
+       speech_output = prayer + " is at " + when_is_prayer('Dhuhr', zipcode)
        should_end_session = True
     elif prayer == 'asr':
-           card_title = prayer + " is at " + when_is_asr()
-           speech_output = prayer + " is at " + when_is_asr()
+           card_title = prayer + " is at " + when_is_prayer('Asr', zipcode)
+           speech_output = prayer + " is at " + when_is_prayer('Asr', zipcode)
            should_end_session = True
     elif prayer == 'maghrib':
-           card_title = prayer + " is at " + when_is_maghrib()
-           speech_output = prayer + " is at " + when_is_maghrib()
+           card_title = prayer + " is at " + when_is_prayer('Maghrib', zipcode)
+           speech_output = prayer + " is at " + when_is_prayer('Maghrib', zipcode)
            should_end_session = True
     elif prayer == 'Isha':
-           card_title = prayer + " is at " + when_is_isha()
-           speech_output = prayer + " is at " + when_is_isha()
+           card_title = prayer + " is at " + when_is_prayer('Isha', zipcode)
+           speech_output = prayer + " is at " + when_is_prayer('Isha', zipcode)
            should_end_session = True
     else:
       card_title = "Invalid Prayer"
       speech_output = "Invalid Prayer, please try again"
+      should_end_session = False
 
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
