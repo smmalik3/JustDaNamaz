@@ -3,7 +3,7 @@
 Copyright (c) 2019. All rights reserved.
 @author:        salman malik
 @created:       1/4/19
-@last modified: 1/6/19
+@last modified: 1/8/19
 """
 from __future__ import print_function
 from botocore.vendored import requests
@@ -12,6 +12,7 @@ import json
 
 # --------------- Helpers that build all of the responses ----------------------
 
+#NOTE: can't use the word 'speechlet' in text output for cards
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
         'outputSpeech': {
@@ -20,8 +21,8 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'card': {
             'type': 'Simple',
-            'title': "SessionSpeechlet - " + title,
-            'content': "SessionSpeechlet - " + output
+            'title': title,
+            'content': output
         },
         'reprompt': {
             'outputSpeech': {
@@ -31,17 +32,17 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'shouldEndSession': should_end_session
     }
-## TODO: Build out ssml speechlet to send back appropriate text for displays, currently only voice is configured
-def build_ssml_speechlet_response(title, output, reprompt_text, should_end_session):
+
+def build_ssml_speechlet_response(title, speech_output, text_output, reprompt_text, should_end_session):
     return {
         'outputSpeech': {
             'type': 'SSML',
-            'ssml': output
+            'ssml': speech_output
         },
         'card': {
             'type': 'Simple',
-            'title': "SessionSpeechlet - " + title,
-            'content': "SessionSpeechlet - " + output
+            'title': title,
+            'content': text_output
         },
         'reprompt': {
             'outputSpeech': {
@@ -80,14 +81,14 @@ def get_welcome_response():
     session_attributes = {}
     card_title = "Welcome"
     speech_output = "<speak> <s>Assalamu Alaykum <break strength='medium'/> welcome to the Prayer Times skill.</s> <s> You can ask me what time a specific prayer is.</s> <s> For example <break strength='medium'/> you can say <break strength='medium'/> When is Fajr? </s> </speak>"
+    text_output = "Assalamu Alaykum, welcome to the Prayer Times skill. You can ask me what time a specific prayer is. For example, you can say: 'When is Fajr?'"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "You can ask me what time a specific prayer " \
-                    "For example, you can says when is Fajr?"
+    reprompt_text = "Assalamu Alaykum, welcome to the Prayer Times skill. You can ask me what time a specific prayer is. For example, you can say: 'When is Fajr?'"
     should_end_session = False
 
     return build_response(session_attributes, build_ssml_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session))
+        card_title, speech_output, text_output, reprompt_text, should_end_session))
 
 def handle_session_end_request():
     card_title = "Session Ended"
@@ -101,7 +102,7 @@ def handle_session_end_request():
 # This url uses zipcode:
 # 'http://api.aladhan.com/v1/timingsByAddress?address=20009'
 
-# Method for getting specific prayter times
+# Method for getting specific prayer times
 def when_is_prayer(prayer, zipcode):
     r = requests.get('http://api.aladhan.com/v1/timingsByAddress?address=' + zipcode + '&method=2')
     r = r.json()
