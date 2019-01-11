@@ -10,7 +10,20 @@ from botocore.vendored import requests
 from datetime import datetime
 import json
 
-# --------------- Helpers that build all of the responses ----------------------
+
+# --------------------------------------------- Planned Updates ---------------------------------------------
+# 1. Ask Alexa: "When is the next prayer?"
+#    Response = "The next prayer is Asr at 4:40 PM"
+# 2. Ask Alexa: "How long until Maghrib?"
+#    Response: "Maghrib is in 29 minutes"
+# 3. When it's a holy day, include Eid greeting after sharing prayer time response.
+# -----------------------------------------------------------------------------------------------------------
+
+# --------------- Release Notes ---------------
+# v1.0 - Initial Version - January 11, 2019
+# ---------------------------------------------
+
+# --------------- Helpers that build all of the responses ---------------
 
 #NOTE: can't use the word 'speechlet' in text output for cards
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
@@ -72,7 +85,7 @@ def get_location(context):
         r = r.json()
         return r['postalCode']
 
-# --------------- Functions that control the skill's behavior ------------------
+# --------------- Functions that control the skill's behavior ---------------
 
 def get_welcome_response():
     """ If we wanted to initialize the session to have some attributes we could
@@ -113,7 +126,7 @@ def when_is_prayer(prayer, zipcode):
 
 def set_prayer_in_session(intent_request, session, context):
     prayer = intent_request['slots']['prayer']['value']
-    
+
     if 'permissions' in context['System']['user']:
         zipcode = get_location(context)
         if prayer == 'fajr':
@@ -148,7 +161,7 @@ def set_prayer_in_session(intent_request, session, context):
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
-# --------------- Events ------------------
+# --------------- Events ---------------
 
 def on_session_started(session_started_request, session):
     """ Called when the session starts """
@@ -192,7 +205,7 @@ def on_session_ended(session_ended_request, session):
           ", sessionId=" + session['sessionId'])
     # add cleanup logic here
 
-# --------------- Main handler ------------------
+# --------------- Main handler ---------------
 
 def lambda_handler(event, context):
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
