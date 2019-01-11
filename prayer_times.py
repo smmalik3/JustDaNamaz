@@ -17,6 +17,8 @@ import json
 # 2. Ask Alexa: "How long until Maghrib?"
 #    Response: "Maghrib is in 29 minutes"
 # 3. When it's a holy day, include Eid greeting after sharing prayer time response.
+# 4. Ask Alexa: "When is Eid?"
+#    Response = "Eid will be on June 1, 2019"
 # -----------------------------------------------------------------------------------------------------------
 
 # --------------- Release Notes ---------------
