@@ -113,32 +113,37 @@ def when_is_prayer(prayer, zipcode):
 
 def set_prayer_in_session(intent_request, session, context):
     prayer = intent_request['slots']['prayer']['value']
-    zipcode = get_location(context)
-
-    if prayer == 'fajr':
-       card_title = prayer + " is at " + when_is_prayer('Fajr', zipcode)
-       speech_output = prayer + " is at " + when_is_prayer('Fajr', zipcode)
-       should_end_session = True
-    elif prayer == 'dhuhr':
-       card_title = prayer + " is at " + when_is_prayer('Dhuhr', zipcode)
-       speech_output = prayer + " is at " + when_is_prayer('Dhuhr', zipcode)
-       should_end_session = True
-    elif prayer == 'asr':
-           card_title = prayer + " is at " + when_is_prayer('Asr', zipcode)
-           speech_output = prayer + " is at " + when_is_prayer('Asr', zipcode)
+    
+    if 'permissions' in context['System']['user']:
+        zipcode = get_location(context)
+        if prayer == 'fajr':
+           card_title = prayer + " is at " + when_is_prayer('Fajr', zipcode)
+           speech_output = prayer + " is at " + when_is_prayer('Fajr', zipcode)
            should_end_session = True
-    elif prayer == 'maghrib':
-           card_title = prayer + " is at " + when_is_prayer('Maghrib', zipcode)
-           speech_output = prayer + " is at " + when_is_prayer('Maghrib', zipcode)
+        elif prayer == 'dhuhr':
+           card_title = prayer + " is at " + when_is_prayer('Dhuhr', zipcode)
+           speech_output = prayer + " is at " + when_is_prayer('Dhuhr', zipcode)
            should_end_session = True
-    elif prayer == 'Isha':
-           card_title = prayer + " is at " + when_is_prayer('Isha', zipcode)
-           speech_output = prayer + " is at " + when_is_prayer('Isha', zipcode)
-           should_end_session = True
+        elif prayer == 'asr':
+               card_title = prayer + " is at " + when_is_prayer('Asr', zipcode)
+               speech_output = prayer + " is at " + when_is_prayer('Asr', zipcode)
+               should_end_session = True
+        elif prayer == 'maghrib':
+               card_title = prayer + " is at " + when_is_prayer('Maghrib', zipcode)
+               speech_output = prayer + " is at " + when_is_prayer('Maghrib', zipcode)
+               should_end_session = True
+        elif prayer == 'Isha':
+               card_title = prayer + " is at " + when_is_prayer('Isha', zipcode)
+               speech_output = prayer + " is at " + when_is_prayer('Isha', zipcode)
+               should_end_session = True
+        else:
+          card_title = "Invalid Prayer"
+          speech_output = "Invalid Prayer, please try again"
+          should_end_session = False
     else:
-      card_title = "Invalid Prayer"
-      speech_output = "Invalid Prayer, please try again"
-      should_end_session = False
+        card_title = "Please enable Device Country and Postal Code Permissions to use the Prayer Times skill."
+        speech_output = "You have refused to allow Prayer Times access to the device country and postal code information in the Alexa app. Prayer Times cannot function without device country and postal code information. To permit access to device country and postal code information, consent to provide device country and postal code information in the Alexa app."
+        should_end_session = True
 
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
